@@ -10,6 +10,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using API.Extensions;
 using Microsoft.AspNetCore.Http;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -18,12 +19,15 @@ namespace API.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly ITokenService _tokenService;
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly IMapper _mapper;
 
-        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,ITokenService tokenService)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager,
+        ITokenService tokenService, IMapper mapper)
         {
             _userManager=userManager;
             _signInManager=signInManager;
             _tokenService=tokenService;
+            _mapper=mapper;
         }
 
         [Authorize]
@@ -48,11 +52,22 @@ namespace API.Controllers
 
         [Authorize]
         [HttpGet("address")]
-        public async Task<ActionResult<Address>> GetUserAddress()
+        public async Task<ActionResult<AddressDto>> GetUserAddress()
         {
            var user=await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
 
-            return user.Address;
+            return _mapper.Map<Address,AddressDto>(user.Address);
+        }
+
+        [Authorize]
+        [HttpPut("address")]
+        public async Task<ActionResult<AddressDto>> UpdateUserAddress(AddressDto address)
+        {
+            var user= await _userManager.FindByUserByClaimsPrincipleWithAddressAsync(HttpContext.User);
+            user.Address=_mapper.Map<AddressDto,Address>(address); 
+            var result=await _userManager.UpdateAsync(user);
+            if(result.Succeeded) return Ok(_mapper.Map<Address,AddressDto>(user.Address));
+            return BadRequest("Problem updating the user");
         }
 
         [HttpPost("login")]
@@ -76,6 +91,10 @@ namespace API.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            if(CheckEmailExistAsync(registerDto.Email).Result.Value)
+            {
+                return new BadRequestObjectResult(new ApiValidationErrorResponse{Errors=new []{"Email address is in use!"}});
+            }
             var user=new AppUser
             {
                 DisplayName=registerDto.DisplayName,
