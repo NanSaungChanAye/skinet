@@ -16,10 +16,11 @@ export class ProductDetailsComponent implements OnInit {
   quantity=1;
 
   constructor(private shopService:ShopService, private activeRoute:ActivatedRoute,private bcService:BreadcrumbService,private basketService:BasketService) {
-    this.bcService.set('@productDetails','');//When loading,to be good page brakdown.
+    //this.bcService.set('@productDetails','');//When loading,to be good page brakdown.
    }
 
   ngOnInit(): void {
+    debugger;
     this.loadProduct();
   }
 

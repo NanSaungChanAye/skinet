@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from 'src/environments/environment';
@@ -11,13 +11,16 @@ import { IProduct } from '../shared/models/product';
 })
 export class BasketService {
   baseUrl=environment.apiUrl;
+  session :any={};
   private basketSource=new BehaviorSubject<IBasket>(null);
   basket$=this.basketSource.asObservable();
   private basketTotalSource=new BehaviorSubject<IBasketTotals>(null);
   basketTotal$=this.basketTotalSource.asObservable();
   constructor(private http:HttpClient) { }
 
+
   getBasket(id:string){
+    debugger;
     return this.http.get(this.baseUrl + 'basket?id=' +id)
             .pipe(
               map((basket:IBasket)=>{
@@ -87,14 +90,18 @@ export class BasketService {
   }
 
   getCurrentBasketValue(){
+    console.log(this.basketSource.value);
     return this.basketSource.value;
   }
 
   addItemToBasket(item:IProduct, quantity=1){
+    debugger;
     const itemToAdd:IBasketItem=this.mapProductItemToBasketItem(item,quantity);
     const basket=this.getCurrentBasketValue()?? this.createBasket();
     //basket.items.push(itemToAdd);
     basket.items=this.addOrUpdateItem(basket.items,itemToAdd,quantity);
+    this.calculateTotals();
+
   }
   private addOrUpdateItem(items:IBasketItem[],itemToAdd:IBasketItem,quantity:number):IBasketItem[]{
     console.log(items);
@@ -116,6 +123,7 @@ export class BasketService {
   }
 
   private mapProductItemToBasketItem(item:IProduct,quantity:number):IBasketItem{
+    debugger;
     return{
       id:item.id,
       productName:item.name,

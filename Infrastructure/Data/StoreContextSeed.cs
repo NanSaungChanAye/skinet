@@ -5,6 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 using Core.Entities;
+using Core.Entities.OrderAggregate;
 
 namespace Infrastructure.Data
 {
@@ -40,18 +41,19 @@ namespace Infrastructure.Data
 
                     await context.SaveChangesAsync();
                 }
-                if(!context.Products.Any())
+                if(!context.DeliveryMethods.Any())
                 {
-                    var productsData=File.ReadAllText("../Infrastructure/Data/SeedData/products.json");
+                    var dmData=File.ReadAllText("../Infrastructure/Data/SeedData/delivery.json");
 
-                    var products=JsonSerializer.Deserialize<List<Product>>(productsData);
+                    var methods=JsonSerializer.Deserialize<List<DeliveryMethod>>(dmData);
 
-                    foreach(var item in products)
+                    foreach(var item in methods)
                     {
-                        context.Products.Add(item);
+                        context.DeliveryMethods.Add(item);
                     }
                     await context.SaveChangesAsync();
                 }
+
             }
             catch (System.Exception ex)
             {

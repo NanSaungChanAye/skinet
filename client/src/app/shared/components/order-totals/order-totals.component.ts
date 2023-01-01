@@ -15,6 +15,7 @@ export class OrderTotalsComponent implements OnInit {
 
   ngOnInit():void {
     this.basketTotals$=this.basketService.basketTotal$;
+
   }
 
 }

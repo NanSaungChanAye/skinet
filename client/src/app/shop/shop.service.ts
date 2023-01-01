@@ -56,6 +56,7 @@ export class ShopService {
 
   getProduct(id:number)
   {
+    debugger;
     return this.http.get<IProduct>(this.baseUrl + 'products/' + id);
   }
 }
