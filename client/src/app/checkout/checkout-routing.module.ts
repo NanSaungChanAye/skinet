@@ -3,9 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
 import { CheckoutComponent } from './checkout.component';
 import { CheckoutModule } from './checkout.module';
+import { CheckoutSuccessComponent } from './checkout-success/checkout-success.component';
 
 const routes:Routes=[
-  {path:'',component:CheckoutComponent}
+  {path:'',component:CheckoutComponent},
+  {path:'success',component:CheckoutSuccessComponent}
 ]
 
 @NgModule({
